@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        /* Your existing CSS here... */
+        /* CSS Variables for Consistent Styling */
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #388E3C;
+            --background-color: #f4f6f8;
+            --text-color: #333;
+            --light-text: #555;
+            --footer-bg: #333;
+            --footer-text: #ccc;
+            --hover-color: #45a049;
+            --transition-speed: 0.3s;
+            --font-family: 'Roboto', sans-serif;
+            --max-width: 1200px;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        .burger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .burger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-color);
+            margin: 4px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* Main Content */
+        main {
+            max-width: var(--max-width);
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .blog-list-section h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 36px;
+        }
+
+        .blog-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .blog-item {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .blog-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+
+        .blog-item h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .blog-item h2 a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        .blog-item h2 a:hover {
+            color: var(--secondary-color);
+        }
+
+        .blog-item .meta {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .blog-item .excerpt {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .read-more-link {
+            display: inline-block;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition-speed) ease;
+            margin-top: 10px;
+        }
+
+        .read-more-link:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 2000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes animatetop {
+            from {transform: translateY(-50px); opacity: 0;}
+            to {transform: translateY(0); opacity: 1;}
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .modal-meta {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .modal-body p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 992px) {
+            .burger {
+                display: flex;
+            }
+
+            .blog-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-item h2 {
+                font-size: 20px;
+            }
+
+            .blog-item .excerpt {
+                font-size: 14px;
+            }
+
+            .pagination a, .pagination span {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo span {
+                font-size: 20px;
+            }
+
+
+            .blog-list-section h1 {
+                font-size: 28px;
+            }
+
+            .blog-item h2 {
+                font-size: 18px;
+            }
+
+            .blog-item .excerpt {
+                font-size: 13px;
+            }
+
+            .read-more-link {
+                font-size: 14px;
+            }
+
+            .pagination a, .pagination span {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+        }
+        /* Additional styles for delete button */
+        .delete-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="blog-list-section">
+            <h1>All Blog Posts</h1>
+            <div class="blog-list">
+                <!-- Display User's Blogs -->
+                <h2>Your Blogs</h2>
+                {% for blog in user_blogs %}
+                    <div class="blog-item">
+                        <h2>
+                            <a href="#" class="read-more-link" 
+                               data-title="{{ blog.title|escape }}" 
+                               data-author="{{ blog.author.username|escape }}" 
+                               data-date="{{ blog.created_at|date:"F d, Y" }}">
+                                {{ blog.title }}
+                            </a>
+                        </h2>
+                        <p class="meta">By {{ blog.author.username }} on {{ blog.created_at|date:"F d, Y" }}</p>
+                        <p class="excerpt">{{ blog.content|truncatewords:50 }}</p>
+                        <a href="#" class="read-more-link" 
+                           data-title="{{ blog.title|escape }}" 
+                           data-author="{{ blog.author.username|escape }}" 
+                           data-date="{{ blog.created_at|date:"F d, Y" }}">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <!-- Delete Button -->
+                        <form method="POST" action="{% url 'delete_blog' blog.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                        <!-- Hidden Content for Modal -->
+                        <div class="hidden-content" style="display: none;">
+                            {{ blog.content|linebreaks }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p style="text-align: center; font-size: 18px; color: #555;">You have no blogs available at the moment.</p>
+                {% endfor %}
+
+                <hr>
+
+                <!-- Display Other Blogs -->
+                <h2>Other Blogs</h2>
+                {% for blog in other_blogs %}
+                    <div class="blog-item">
+                        <h2>
+                            <a href="#" class="read-more-link" 
+                               data-title="{{ blog.title|escape }}" 
+                               data-author="{{ blog.author.username|escape }}" 
+                               data-date="{{ blog.created_at|date:"F d, Y" }}">
+                                {{ blog.title }}
+                            </a>
+                        </h2>
+                        <p class="meta">By {{ blog.author.username }} on {{ blog.created_at|date:"F d, Y" }}</p>
+                        <p class="excerpt">{{ blog.content|truncatewords:50 }}</p>
+                        <a href="#" class="read-more-link" 
+                           data-title="{{ blog.title|escape }}" 
+                           data-author="{{ blog.author.username|escape }}" 
+                           data-date="{{ blog.created_at|date:"F d, Y" }}">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <!-- Hidden Content for Modal -->
+                        <div class="hidden-content" style="display: none;">
+                            {{ blog.content|linebreaks }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p style="text-align: center; font-size: 18px; color: #555;">No other blog posts available at the moment.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination Controls -->
+            {% if is_paginated %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- Modal Structure (No changes needed) -->
+    <div id="blogModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalContent">
+        <div class="modal-content">
+            <span class="close" aria-label="Close modal">&times;</span>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <p class="modal-meta" id="modalMeta"></p>
+            <div class="modal-body" id="modalContent">
+                <!-- Blog content will be injected here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const burger = document.querySelector('.burger');
+            const navLinks = document.querySelector('.nav-links');
+            const modal = document.getElementById('blogModal');
+            const closeModal = document.querySelector('.close');
+            const modalTitle = document.querySelector('.modal-title');
+            const modalMeta = document.querySelector('.modal-meta');
+            const modalContent = document.querySelector('.modal-body');
+
+            // Toggle Navigation
+            const toggleNav = () => {
+                navLinks.classList.toggle('nav-active');
+                const isActive = navLinks.classList.contains('nav-active');
+                burger.setAttribute('aria-expanded', isActive);
+            };
+
+            burger.addEventListener('click', toggleNav);
+            burger.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleNav();
+                }
+            });
+
+            // Open Modal
+            const openModal = (title, author, date, content) => {
+                modalTitle.textContent = title;
+                modalMeta.textContent = `By ${author} on ${date}`;
+                modalContent.innerHTML = content;
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+            };
+
+            // Close Modal
+            const closeModalFunction = () => {
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+            };
+
+            closeModal.addEventListener('click', closeModalFunction);
+
+            window.addEventListener('click', (event) => {
+                if (event.target == modal) {
+                    closeModalFunction();
+                }
+            });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.style.display === 'flex') {
+                    closeModalFunction();
+                }
+            });
+
+            // Attach event listeners to "Read More" links
+            const readMoreLinks = document.querySelectorAll('.read-more-link');
+            readMoreLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const title = link.getAttribute('data-title');
+                    const author = link.getAttribute('data-author');
+                    const date = link.getAttribute('data-date');
+                    // Fetch the closest .blog-item and get the hidden content
+                    const blogItem = link.closest('.blog-item');
+                    const hiddenContent = blogItem.querySelector('.hidden-content').innerHTML;
+                    openModal(title, author, date, hiddenContent);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

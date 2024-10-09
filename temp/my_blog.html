@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<!-- Removed redundant <!DOCTYPE html>, <html>, <head>, and <body> tags -->
+
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fff; /* White background */
+        color: #333;
+    }
+
+    main {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .blog-list-section {
+        background-color: #f0f0f0; /* Light grey for contrast */
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .blog-list-section h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        color: #28a745; /* Green color */
+    }
+
+    .blog-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .blog-item {
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background-color: #fff; /* White background */
+        transition: box-shadow 0.3s ease;
+    }
+
+    .blog-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .blog-item h2 {
+        margin-top: 0;
+        font-size: 1.8rem;
+        color: #28a745; /* Green color */
+    }
+
+    .meta {
+        font-size: 0.9rem;
+        color: #777;
+        margin-bottom: 15px;
+    }
+
+    .excerpt {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-button, .delete-button, .confirm-button, .cancel-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .edit-button {
+        background-color: #28a745; /* Green */
+    }
+
+    .edit-button:hover {
+        background-color: #218838;
+    }
+
+    .delete-button {
+        background-color: #28a745; /* Green */
+    }
+
+    .delete-button:hover {
+        background-color: #218838;
+    }
+
+    .confirm-button {
+        background-color: #28a745; /* Green */
+    }
+
+    .confirm-button:hover {
+        background-color: #218838;
+    }
+
+    .cancel-button {
+        background-color: #6c757d; /* Grey */
+    }
+
+    .cancel-button:hover {
+        background-color: #5a6268;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .pagination a:hover {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .pagination .current {
+        background-color: #28a745;
+        color: #fff;
+        border-color: #28a745;
+    }
+
+    /* Modals */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* Full-Screen Edit Modal */
+    #editModal.modal {
+        padding: 0;
+    }
+
+    #editModal .modal-content {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        border-radius: 0;
+        padding: 40px;
+    }
+
+    .modal-title {
+        margin-top: 0;
+        font-size: 2rem;
+        color: #28a745; /* Green color */
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 2rem;
+        color: #aaa;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close:hover {
+        color: #000;
+    }
+
+    form div {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    input[type="text"], textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        resize: vertical;
+    }
+
+    button[type="submit"] {
+        background-color: #28a745; /* Green */
+        color: #fff;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #218838;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 20px;
+        }
+
+        .blog-item h2 {
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .edit-button, .delete-button, .confirm-button, .cancel-button {
+            width: 100%;
+            margin-right: 0;
+        }
+
+        .pagination {
+            gap: 5px;
+        }
+    }
+</style>
+
+<!-- Main Content -->
+<main>
+    <section class="blog-list-section">
+        <h1>Your Blog Posts</h1>
+        <div class="blog-list">
+            {% for blog in blogs %}
+                <div class="blog-item" id="blog-{{ blog.id }}">
+                    <h2>{{ blog.title }}</h2>
+                    <p class="meta">By {{ blog.author.username }} on {{ blog.created_at|date:"F d, Y" }}</p>
+                    <p class="excerpt">{{ blog.content|truncatewords:50 }}</p>
+                    <div class="action-buttons">
+                        <button class="edit-button" 
+                                data-id="{{ blog.id }}" 
+                                data-title="{{ blog.title|escape }}" 
+                                data-content="{{ blog.content|escape }}">
+                            Edit
+                        </button>
+                        <button class="delete-button" 
+                                data-id="{{ blog.id }}" 
+                                data-title="{{ blog.title|escape }}">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            {% empty %}
+                <p style="text-align: center; font-size: 18px; color: #555;">You have not written any blog posts yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="current">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+</main>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="editModalTitle" aria-describedby="editModalContent">
+    <div class="modal-content">
+        <span class="close" aria-label="Close modal">&times;</span>
+        <h2 class="modal-title" id="editModalTitle">Edit Blog</h2>
+        <form id="editBlogForm">
+            {% csrf_token %}
+            <input type="hidden" id="editBlogId" name="blog_id">
+            <div>
+                <label for="editTitle">Title:</label>
+                <input type="text" id="editTitle" name="title" required>
+            </div>
+            <div>
+                <label for="editContent">Content:</label>
+                <textarea id="editContent" name="content" rows="15" required></textarea>
+            </div>
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="deleteModalTitle" aria-describedby="deleteModalContent">
+    <div class="modal-content">
+        <span class="close" aria-label="Close modal">&times;</span>
+        <h2 class="modal-title" id="deleteModalTitle">Confirm Deletion</h2>
+        <p id="deleteModalContent">Are you sure you want to delete this blog post?</p>
+        <div class="action-buttons">
+            <button id="confirmDelete" class="confirm-button">Yes, Delete</button>
+            <button id="cancelDelete" class="cancel-button">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editModal = document.getElementById('editModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const closeButtons = document.querySelectorAll('.close');
+        let currentBlogId = null;
+
+        // Function to open a modal
+        const openModal = (modal) => {
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            // Disable background scrolling
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Function to close a modal
+        const closeModalFunction = (modal) => {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            // Enable background scrolling
+            document.body.style.overflow = 'auto';
+        };
+
+        // Attach event listeners to close buttons
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal');
+                closeModalFunction(modal);
+            });
+        });
+
+        // Close modal when clicking outside of the modal content
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                closeModalFunction(event.target);
+            }
+        });
+
+        // Handle Escape key to close modals
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                [editModal, deleteModal].forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        closeModalFunction(modal);
+                    }
+                });
+            }
+        });
+
+        // Edit Button Functionality
+        const editButtons = document.querySelectorAll('.edit-button');
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const blogId = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                const content = button.getAttribute('data-content');
+
+                // Populate the form with existing data
+                document.getElementById('editBlogId').value = blogId;
+                document.getElementById('editTitle').value = title;
+                document.getElementById('editContent').value = content;
+
+                // Open the edit modal
+                openModal(editModal);
+            });
+        });
+
+        // Handle Edit Form Submission
+        const editBlogForm = document.getElementById('editBlogForm');
+        editBlogForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const blogId = document.getElementById('editBlogId').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            if (!title || !content) {
+                alert('Both title and content are required.');
+                return;
+            }
+
+            fetch(`/edit_blog/${blogId}/`, { // Ensure your URL pattern matches
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ title, content }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the blog item in the DOM without reloading
+                    const blogItem = document.getElementById(`blog-${blogId}`);
+                    blogItem.querySelector('h2').textContent = data.blog.title;
+                    blogItem.querySelector('.meta').textContent = `By ${data.blog.author} on ${data.blog.created_at}`;
+                    blogItem.querySelector('.excerpt').textContent = data.blog.excerpt;
+
+                    // Update data attributes
+                    const editBtn = blogItem.querySelector('.edit-button');
+                    editBtn.setAttribute('data-title', data.blog.title);
+                    editBtn.setAttribute('data-content', data.blog.content);
+
+                    closeModalFunction(editModal);
+                    alert('Blog post updated successfully.');
+                } else {
+                    alert('Error: ' + (data.errors || 'Unknown error.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the blog post.');
+            });
+        });
+
+        // Delete Button Functionality
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const blogId = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+
+                // Set the current blog ID to be deleted
+                currentBlogId = blogId;
+
+                // Update the modal content
+                document.getElementById('deleteModalContent').textContent = `Are you sure you want to delete the blog post titled "${title}"?`;
+
+                // Open the delete modal
+                openModal(deleteModal);
+            });
+        });
+
+        // Confirm Delete
+        const confirmDeleteButton = document.getElementById('confirmDelete');
+        confirmDeleteButton.addEventListener('click', () => {
+            if (currentBlogId) {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch(`/delete_blog/${currentBlogId}/`, { // Ensure your URL pattern matches
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the blog item from the DOM
+                        const blogItem = document.getElementById(`blog-${currentBlogId}`);
+                        blogItem.parentNode.removeChild(blogItem);
+
+                        closeModalFunction(deleteModal);
+                        alert('Blog post deleted successfully.');
+                    } else {
+                        alert('Error deleting blog.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the blog post.');
+                });
+            }
+        });
+
+        // Cancel Delete
+        const cancelDeleteButton = document.getElementById('cancelDelete');
+        cancelDeleteButton.addEventListener('click', () => {
+            closeModalFunction(deleteModal);
+            currentBlogId = null;
+        });
+    });
+</script>
+{% endblock %}

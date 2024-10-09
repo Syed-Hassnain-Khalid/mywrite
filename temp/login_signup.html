@@ -1,0 +1,379 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login/Sign Up</title>
+  <link rel="shortcut icon" href="{% static 'logo.png' %}" type="image/x-icon">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
+
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Open Sans", sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff; /* Set background to white */
+    }
+
+    /* Container Styles */
+    .container {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 100%;
+      background-color: #f5f5f5; /* Light grey background for container */
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Form Section */
+    .form-section {
+      flex: 1;
+      padding: 40px;
+      background: #fff; /* White background for form section */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Image Section */
+    .image-section {
+      flex: 1;
+      background: url("{% static 'right-image.jpg' %}") no-repeat center center;
+      background-size: cover;
+      position: relative;
+    }
+
+    /* Overlay on Image */
+    .image-section::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%; 
+      transition: background 0.3s ease-in-out;
+    }
+
+    /* Form Elements */
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #28a745; /* Green color for headings */
+      text-align: center;
+    }
+
+    .input-field {
+      position: relative;
+      border-bottom: 2px solid #28a745; /* Green underline */
+      margin: 15px 0;
+    }
+
+    .input-field label {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      color: #28a745; /* Green color for labels */
+      font-size: 16px;
+      pointer-events: none;
+      transition: 0.15s ease;
+    }
+
+    .input-field input {
+      width: 100%;
+      height: 40px;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      color: #28a745; /* Green color for input text */
+    }
+
+    .input-field input:focus ~ label,
+    .input-field input:valid ~ label {
+      font-size: 0.8rem;
+      top: 10px;
+      transform: translateY(-120%);
+      color: #28a745;
+    }
+
+    .forget {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 25px 0 35px 0;
+      color: #28a745; /* Green color */
+    }
+
+    #remember {
+      accent-color: #28a745; /* Green color for checkbox */
+    }
+
+    .forget label {
+      display: flex;
+      align-items: center;
+    }
+
+    .forget label p {
+      margin-left: 8px;
+    }
+
+    .form-section a {
+      color: #28a745;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .form-section a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      background: #28a745;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 16px;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .register {
+      text-align: center;
+      margin-top: 30px;
+      color: #28a745;
+    }
+
+    /* Tab Styles */
+    .tab {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #28a745;
+    }
+
+    .tab button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #28a745;
+      padding: 10px 20px;
+      transition: color 0.3s ease, background 0.3s ease;
+      position: relative;
+    }
+
+    .tab button.active {
+      color: #fff;
+      background: #28a745;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .form-container {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    /* Form Header */
+    .form-header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    /* Fade In Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .image-section {
+        height: 200px;
+      }
+
+      .tab {
+        flex-direction: column;
+        border-bottom: none;
+      }
+
+      .tab button {
+        width: 100%;
+        text-align: center;
+        border-radius: 0;
+        border-bottom: 1px solid #28a745;
+      }
+
+      .tab button.active {
+        border-bottom: none;
+        border-radius: 3px 3px 0 0;
+      }
+    }
+
+    /* Hide Image on Very Small Screens */
+    @media (max-width: 480px) {
+      .image-section {
+        display: none;
+      }
+
+      .container {
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .form-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Form Section -->
+    <div class="form-section">
+      <!-- Tabs for Login and Sign Up -->
+      <div class="tab">
+        <button class="tablinks {% if form == 'login' %}active{% endif %}" onclick="openForm(event, 'Login')">Login</button>
+        <button class="tablinks {% if form == 'signup' %}active{% endif %}" onclick="openForm(event, 'Signup')">Sign Up</button>
+      </div>
+      
+      <!-- Login Form -->
+      <div id="Login" class="form-container {% if form == 'login' %}active{% endif %}">
+        <div class="form-header">Login</div>
+        <form action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          <div class="input-field">
+            <input id="user_name" name="user_name" type="text" required>
+            <label for="user_name">Enter your user name</label>
+          </div>
+          <div class="input-field">
+            <input id="password" name="password" type="password" required>
+            <label for="password">Enter your password</label>
+          </div>
+          <div class="forget">
+            <label for="remember">
+              <input type="checkbox" id="remember" name="remember">
+              <p>Remember me</p>
+            </label>
+            <a href="#">Forgot Password?</a>
+          </div>
+          <button type="submit" name="login">Log In</button>
+          <div class="register">
+            <p>Don't have an account? <a href="javascript:void(0)" onclick="openForm(event, 'Signup')">Register</a></p>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Sign Up Form -->
+      <div id="Signup" class="form-container {% if form == 'signup' %}active{% endif %}">
+        <div class="form-header">Sign Up</div>
+        <form action="{% url 'handlesignup' %}" method="post">
+          {% csrf_token %}
+          <div class="input-field">
+            <input id="first_name" name="first_name" type="text" required>
+            <label for="first_name">First Name</label>
+          </div>
+          <div class="input-field">
+            <input id="last_name" name="last_name" type="text" required>
+            <label for="last_name">Last Name</label>
+          </div>
+          <div class="input-field">
+            <input id="username" name="username" type="text" required>
+            <label for="username">Username</label>
+          </div>
+          <div class="input-field">
+            <input id="password_signup" name="password" type="password" required>
+            <label for="password_signup">Password</label>
+          </div>
+          <div class="input-field">
+            <input id="confirm_password" name="confirm_password" type="password" required>
+            <label for="confirm_password">Confirm Password</label>
+          </div>
+          <button type="submit" name="signup">Sign Up</button>
+          <div class="register">
+            <p>Already have an account? <a href="javascript:void(0)" onclick="openForm(event, 'Login')">Log In</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Image Section -->
+    <div class="image-section">
+      <img src="{% static 'b.png' %}" alt="Blog Logo" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+  </div>
+  
+  <!-- JavaScript for Tab Functionality -->
+  <script>
+    function openForm(evt, formName) {
+      var i, formContainer, tablinks;
+      
+      // Hide all form containers
+      formContainer = document.getElementsByClassName("form-container");
+      for (i = 0; i < formContainer.length; i++) {
+        formContainer[i].classList.remove("active");
+      }
+      
+      // Remove active class from all tabs
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+      }
+      
+      // Show the selected form and add active class to the clicked tab
+      document.getElementById(formName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    // Default open form based on context
+    document.addEventListener("DOMContentLoaded", function() {
+      var activeForm = "{% if form == 'login' %}Login{% elif form == 'signup' %}Signup{% else %}Login{% endif %}";
+      document.getElementById(activeForm).classList.add("active");
+      var buttons = document.getElementsByClassName("tablinks");
+      for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i].textContent.trim() === activeForm) {
+          buttons[i].classList.add("active");
+        }
+      }
+    });
+  </script>
+</body>
+</html>

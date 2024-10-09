@@ -1,0 +1,207 @@
+{% extends "base.html"%}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #388E3C;
+        }
+        .burger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .burger div {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            margin: 4px;
+            transition: all 0.3s ease;
+        }
+
+        /* Add Blog Container */
+        .add-blog-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .add-blog-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+
+        .add-blog-container h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .add-blog-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .add-blog-container form label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .add-blog-container form input[type="text"],
+        .add-blog-container form textarea {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .add-blog-container form input[type="text"]:focus,
+        .add-blog-container form textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .add-blog-container form button {
+            padding: 12px;
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .add-blog-container form button:hover {
+            background-color: #388E3C;
+            transform: scale(1.02);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            font-size: 16px;
+            font-weight: 500;
+            color: #4CAF50;
+        }
+
+        .back-link a:hover {
+            color: #388E3C;
+        }
+
+        @media (max-width: 992px) {
+            .burger {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .add-blog-container {
+                padding: 25px;
+            }
+
+            .add-blog-container h1 {
+                font-size: 24px;
+            }
+
+            .add-blog-container form button {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .add-blog-container {
+                padding: 20px;
+            }
+
+            .add-blog-container h1 {
+                font-size: 20px;
+            }
+
+            .add-blog-container form input[type="text"],
+            .add-blog-container form textarea {
+                font-size: 14px;
+            }
+
+            .add-blog-container form button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="add-blog-container">
+        <h1>Add New Blog Post</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="title">Blog Title</label>
+            <input type="text" id="title" name="title" placeholder="Enter blog title" required>
+            
+            <label for="content">Content</label>
+            <textarea id="content" name="content" placeholder="Write your blog content here..." rows="10" required></textarea>
+            
+            <button type="submit">Publish</button>
+        </form>
+        <div class="back-link">
+            <a href="{% url 'readblog' %}">&larr; Back to Blogs</a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const burger = document.querySelector('.burger');
+            const navLinks = document.querySelector('.nav-links');
+
+            const toggleNav = () => {
+                navLinks.classList.toggle('nav-active');
+                const isActive = navLinks.classList.contains('nav-active');
+                burger.setAttribute('aria-expanded', isActive);
+            };
+
+            burger.addEventListener('click', toggleNav);
+            burger.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleNav();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}
